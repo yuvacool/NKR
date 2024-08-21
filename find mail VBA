@@ -1,0 +1,47 @@
+Sub CheckMailLastHour()
+    Dim ns As Outlook.Namespace
+    Dim targetFolder As Outlook.Folder
+    Dim item As Outlook.MailItem
+    Dim subjectToFind As String
+    Dim startTime As Date
+    Dim endTime As Date
+    Dim itemReceivedTime As Date
+    Dim found As Boolean
+
+    ' Set the subject line to search for
+    subjectToFind = "Your Subject Line Here"
+    
+    ' Calculate the time range (last 1 hour)
+    endTime = Now
+    startTime = DateAdd("h", -1, endTime)
+
+    ' Get the namespace and folder
+    Set ns = Application.GetNamespace("MAPI")
+    Set targetFolder = ns.Folders("YourFolderNameHere") ' Replace with the actual folder name
+
+    ' Initialize
+    found = False
+
+    ' Check each mail item in the folder
+    For Each item In targetFolder.Items
+        If TypeName(item) = "MailItem" Then
+            ' Get the received time of the email
+            itemReceivedTime = item.ReceivedTime
+            
+            ' Check if the subject matches and the received time is within the last hour
+            If item.Subject = subjectToFind And _
+               itemReceivedTime >= startTime And _
+               itemReceivedTime <= endTime Then
+                found = True
+                Exit For
+            End If
+        End If
+    Next item
+    
+    ' Display a message if the email is found within the last hour
+    If found Then
+        MsgBox "Email with subject '" & subjectToFind & "' was found within the last hour."
+    Else
+        MsgBox "No email with subject '" & subjectToFind & "' found within the last hour."
+    End If
+End Sub
