@@ -1,0 +1,31 @@
+# Define parameters
+$subjectToFind = "Your Subject Here"
+$folderName = "Your Folder Name Here"  # Folder where you want to check for the email
+$timeRange = (Get-Date).AddHours(-1)   # Example: check emails received in the last 1 hour
+
+# Initialize Outlook application
+$outlook = New-Object -ComObject Outlook.Application
+
+# Get the namespace and the specific folder
+$namespace = $outlook.GetNamespace("MAPI")
+$folder = $namespace.Folders.Item("Your Mailbox Name Here").Folders.Item($folderName)
+
+if (-not $folder) {
+    Write-Output "Folder '$folderName' not found."
+    exit
+}
+
+# Retrieve the items in the specified folder
+$items = $folder.Items
+$items.Sort("[ReceivedTime]", $true)  # Sort items by received time in descending order
+
+# Filter for emails with the specific subject within the time range
+$email = $items | Where-Object { 
+    ($_.Subject -like "*$subjectToFind*") -and ($_.ReceivedTime -ge $timeRange) 
+}
+
+if ($email) {
+    Write-Output "Email with subject '$subjectToFind' found in '$folderName' received within the last hour."
+} else {
+    Write-Output "No email with subject '$subjectToFind' found in '$folderName' received within the last hour."
+}
