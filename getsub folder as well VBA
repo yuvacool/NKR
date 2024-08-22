@@ -1,0 +1,39 @@
+Sub ListRootAndSubFolders()
+    Dim ns As Outlook.Namespace
+    Dim folder As Outlook.Folder
+    Dim folderList As String
+
+    ' Get the namespace
+    Set ns = Application.GetNamespace("MAPI")
+
+    ' Initialize folder list
+    folderList = "Root-Level Folders and Subfolders:" & vbCrLf & vbCrLf
+
+    ' Loop through all root-level folders
+    For Each folder In ns.Folders
+        ' Add the root folder name to the list
+        folderList = folderList & folder.Name & vbCrLf
+
+        ' Call the recursive function to get subfolders
+        folderList = folderList & ListSubFolders(folder, "  ") ' The "  " adds indentation for subfolders
+    Next folder
+
+    ' Display the folder names
+    MsgBox folderList
+End Sub
+
+Function ListSubFolders(ByVal folder As Outlook.Folder, ByVal indent As String) As String
+    Dim subFolder As Outlook.Folder
+    Dim subFolderList As String
+
+    ' Loop through each subfolder
+    For Each subFolder In folder.Folders
+        ' Add the subfolder name to the list with indentation
+        subFolderList = subFolderList & indent & subFolder.Name & vbCrLf
+
+        ' Recursively list any sub-subfolders
+        subFolderList = subFolderList & ListSubFolders(subFolder, indent & "  ")
+    Next subFolder
+
+    ListSubFolders = subFolderList
+End Function
