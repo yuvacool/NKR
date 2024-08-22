@@ -1,0 +1,48 @@
+Sub GetMailSubjectsLast2Hours()
+    Dim ns As Outlook.Namespace
+    Dim targetFolder As Outlook.Folder
+    Dim items As Outlook.Items
+    Dim item As Object
+    Dim mail As Outlook.MailItem
+    Dim startTime As Date
+    Dim endTime As Date
+    Dim itemReceivedTime As Date
+    Dim subjectList As String
+
+    ' Calculate the time range (last 2 hours)
+    endTime = Now
+    startTime = DateAdd("h", -2, endTime)
+
+    ' Get the namespace and folder
+    Set ns = Application.GetNamespace("MAPI")
+    Set targetFolder = ns.Folders("YourFolderNameHere") ' Replace with the actual folder name
+
+    ' Get all items in the folder
+    Set items = targetFolder.Items
+
+    ' Sort items by ReceivedTime in descending order
+    items.Sort "[ReceivedTime]", True
+    
+    ' Initialize
+    subjectList = "Subjects of Emails Received in the Last 2 Hours:" & vbCrLf & vbCrLf
+
+    ' Check each item in the folder
+    For Each item In items
+        ' Check if the item is a mail item
+        If TypeName(item) = "MailItem" Then
+            Set mail = item
+            
+            ' Get the received time of the email
+            itemReceivedTime = mail.ReceivedTime
+            
+            ' Check if the received time is within the last 2 hours
+            If itemReceivedTime >= startTime And itemReceivedTime <= endTime Then
+                ' Append the subject to the list
+                subjectList = subjectList & mail.Subject & vbCrLf
+            End If
+        End If
+    Next item
+    
+    ' Display the list of subjects
+    MsgBox subjectList
+End Sub
