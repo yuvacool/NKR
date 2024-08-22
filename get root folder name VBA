@@ -1,0 +1,20 @@
+Sub ListRootFolders()
+    Dim ns As Outlook.Namespace
+    Dim folder As Outlook.Folder
+    Dim rootFolderName As String
+    Dim folderList As String
+
+    ' Get the namespace
+    Set ns = Application.GetNamespace("MAPI")
+
+    ' Initialize folder list
+    folderList = "Root-Level Folders:" & vbCrLf & vbCrLf
+
+    ' Loop through all root-level folders
+    For Each folder In ns.Folders
+        folderList = folderList & folder.Name & vbCrLf
+    Next folder
+
+    ' Display the folder names
+    MsgBox folderList
+End Sub
