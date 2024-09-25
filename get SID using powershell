@@ -1,0 +1,18 @@
+# Get the SID for the logged-in user
+$SID = (New-Object System.Security.Principal.WindowsIdentity).User.Value
+
+# Define the registry key and value name you want to check
+$RegistryKeyPath = "HKU:\$SID\Software\Your\Registry\Path"
+$ValueName = "YourValueName"
+
+# Check if the registry key and value exist
+if (Test-Path -Path $RegistryKeyPath) {
+    $Value = Get-ItemProperty -Path $RegistryKeyPath -Name $ValueName -ErrorAction SilentlyContinue
+    if ($Value -ne $null) {
+        Write-Host "Registry value exists."
+    } else {
+        Write-Host "Registry value does not exist."
+    }
+} else {
+    Write-Host "Registry key does not exist."
+}
