@@ -1,0 +1,71 @@
+Sub FormatCellWithHTML()
+    Dim ws As Worksheet
+    Dim cell As Range
+    Dim htmlContent As String
+    Dim startPos As Long, endPos As Long
+    Dim tag As String, content As String
+    Dim charFormat As Object
+    
+    ' Set the worksheet and range
+    Set ws = ThisWorkbook.Sheets("Sheet1") ' Change "Sheet1" to your sheet name
+    Set cell = ws.Range("A1") ' Change to the cell containing the HTML
+    
+    ' Get the HTML content from the cell
+    htmlContent = cell.Value
+    
+    ' Clear existing formatting in the cell
+    cell.ClearFormats
+    cell.Value = "" ' Clear the cell value
+    
+    ' Loop through the HTML content and apply formatting
+    Do While Len(htmlContent) > 0
+        ' Find the next HTML tag
+        startPos = InStr(htmlContent, "<")
+        endPos = InStr(htmlContent, ">")
+        
+        If startPos > 0 And endPos > startPos Then
+            ' Extract the tag
+            tag = Mid(htmlContent, startPos, endPos - startPos + 1)
+            
+            ' Extract the content before the tag
+            content = Left(htmlContent, startPos - 1)
+            
+            ' Add the content to the cell
+            If Len(content) > 0 Then
+                cell.Value = cell.Value & content
+            End If
+            
+            ' Apply formatting based on the tag
+            Select Case LCase(tag)
+                Case "<b>"
+                    cell.Characters(Len(cell.Value) + 1, 0).Font.Bold = True
+                Case "</b>"
+                    cell.Characters(Len(cell.Value) + 1, 0).Font.Bold = False
+                Case "<i>"
+                    cell.Characters(Len(cell.Value) + 1, 0).Font.Italic = True
+                Case "</i>"
+                    cell.Characters(Len(cell.Value) + 1, 0).Font.Italic = False
+                Case "<u>"
+                    cell.Characters(Len(cell.Value) + 1, 0).Font.Underline = True
+                Case "</u>"
+                    cell.Characters(Len(cell.Value) + 1, 0).Font.Underline = False
+                Case "<font color=""red"">"
+                    cell.Characters(Len(cell.Value) + 1, 0).Font.Color = RGB(255, 0, 0)
+                Case "</font>"
+                    cell.Characters(Len(cell.Value) + 1, 0).Font.Color = RGB(0, 0, 0) ' Reset to black
+                Case "<p>"
+                    ' Add a line break after the paragraph
+                    cell.Value = cell.Value & vbCrLf
+                Case "</p>"
+                    ' Do nothing for closing </p> tag
+            End Select
+            
+            ' Remove the processed part of the HTML content
+            htmlContent = Mid(htmlContent, endPos + 1)
+        Else
+            ' No more tags, add the remaining content
+            cell.Value = cell.Value & htmlContent
+            Exit Do
+        End If
+    Loop
+End Sub
